@@ -1,6 +1,6 @@
 class ACF {
-  String bierTyp;
-  String alkoholgehalt;
+  String? bierTyp;
+  String? alkoholgehalt;
 
   ACF.fromJson(Map<String, dynamic> json) {
     bierTyp = json['bier-typ'];
