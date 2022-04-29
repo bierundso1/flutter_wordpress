@@ -99,7 +99,7 @@ class Post {
 
   /// The featured Media of the post.
   Media? featuredMedia;
-  ACF acf;
+  ACF? acf;
 
   Post({
     this.date,
