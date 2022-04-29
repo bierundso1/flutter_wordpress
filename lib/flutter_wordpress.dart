@@ -62,6 +62,7 @@ export 'schemas/tag.dart';
 export 'schemas/title.dart';
 export 'schemas/user.dart';
 export 'schemas/wordpress_error.dart';
+import 'schemas/acf.dart';
 
 /// All WordPress related functionality are defined under this class.
 class WordPress {
