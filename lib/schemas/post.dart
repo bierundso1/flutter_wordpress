@@ -11,6 +11,7 @@ import 'media.dart';
 import 'tag.dart';
 import 'title.dart';
 import 'user.dart';
+import 'acf.dart';
 
 /// A [WordPress Post](https://developer.wordpress.org/rest-api/reference/posts/)
 ///
@@ -98,6 +99,7 @@ class Post {
 
   /// The featured Media of the post.
   Media? featuredMedia;
+  ACF acf;
 
   Post({
     this.date,
@@ -118,6 +120,7 @@ class Post {
     this.format = PostFormat.standard,
     this.categoryIDs,
     this.tagIDs,
+    this.acf,
   })  : this.title = new Title(rendered: title),
         this.featuredMedia = new Media(sourceUrl: featuredMedia),
         this.content = new Content(rendered: content),
@@ -132,6 +135,7 @@ class Post {
     modifiedGmt = json['modified_gmt'];
     password = json['password'];
     slug = json['slug'];
+    acf = json['acf'] != null ? new ACF.fromJson(json['acf']) : null;
     if (json['status'] != null) {
       PostPageStatus.values.forEach((val) {
         if (enumStringToName(val.toString()) == json['status']) {
@@ -203,6 +207,8 @@ class Post {
     data['format'] = enumStringToName(this.format.toString());
     data['categories'] = listToUrlString(this.categoryIDs ?? []);
     data['tags'] = listToUrlString(this.tagIDs ?? []);
+    if (this.acf != null)
+      data['acf'] = this.acf;
 
     return data;
   }
