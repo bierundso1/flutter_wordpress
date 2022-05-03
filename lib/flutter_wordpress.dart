@@ -271,7 +271,9 @@ class WordPress {
       bool fetchFeaturedMedia = false,
       bool fetchAttachments = false,
       String postType = "posts",
-      bool fetchAll = false}) async {
+      bool fetchAll = false}) async
+  {
+
     int bulkBatchNum = 100;
 
     if (fetchAll) {
@@ -368,40 +370,6 @@ class WordPress {
               result.users.forEach((u) {
                 if (u.id != null) authorsByID[u.id!] = u;
               });
-            }
-          }
-        }
-      };
-
-      //handler to fetch comments
-      var handleGettingComments = ({bool setComments = false}) async {
-        if (setComments) {
-          List<Comment> comments = await this.fetchComments(
-              params: ParamsCommentList(
-            includePostIDs: pids,
-            order: orderComments,
-            orderBy: orderCommentsBy,
-            perPage: bulkBatchNum,
-            pageNum: 1,
-          ));
-          if (comments.length != 0) {
-            comments.forEach((comment) {
-              commentsForPostIDs[comment.post]?.add(comment);
-            });
-            var i = 2;
-            while (comments.length == bulkBatchNum) {
-              comments = await this.fetchComments(
-                  params: ParamsCommentList(
-                includePostIDs: pids,
-                order: orderComments,
-                orderBy: orderCommentsBy,
-                perPage: bulkBatchNum,
-                pageNum: i,
-              ));
-              comments.forEach((comment) {
-                commentsForPostIDs[comment.post]?.add(comment);
-              });
-              i += 1;
             }
           }
         }
@@ -533,7 +501,6 @@ class WordPress {
 
       await Future.wait([
         handleGettingAuthors(setAuthor: fetchAuthor),
-        handleGettingComments(setComments: fetchComments),
         handleGettingCategories(setCategories: fetchCategories),
         handleGettingTags(setTags: fetchTags),
         handleGettingFeaturedMedia(setFeaturedMedia: fetchFeaturedMedia),
@@ -546,18 +513,7 @@ class WordPress {
         if (fetchAuthor) {
           post.author = authorsByID[post.authorID];
         }
-        //handle comments
-        if (fetchComments) {
-          post.comments = commentsForPostIDs[post.id];
-          post.commentsHierarchy = [];
-          if (post.comments != null) {
-            post.comments?.forEach((comment) {
-              if (comment.parent == 0)
-                post.commentsHierarchy?.add(
-                    _commentHierarchyBuilder(post.comments ?? [], comment));
-            });
-          }
-        }
+
         //handle categories
         if (fetchCategories) {
           post.categories = [];
@@ -591,8 +547,6 @@ class WordPress {
           (await fetchPosts(
             postParams: postParams.copyWith(pageNum: i),
             fetchAuthor: fetchAuthor,
-            fetchComments: fetchComments,
-            orderComments: orderComments,
             orderCommentsBy: orderCommentsBy,
             fetchCategories: fetchCategories,
             fetchTags: fetchTags,
@@ -726,82 +680,6 @@ class WordPress {
     }
   }
 
-  /// This returns a list of [Comment] based on the filter parameters
-  /// specified through [ParamsCommentList] object. By default it returns only
-  /// [ParamsCommentList.perPage] number of comments in page [ParamsCommentList.pageNum].
-  ///
-  /// In case of an error, a [WordPressError] object is thrown.
-  Future<List<Comment>> fetchComments({
-    required ParamsCommentList params,
-  }) async {
-    final StringBuffer url = new StringBuffer(_baseUrl + URL_COMMENTS);
-
-    url.write(params.toString());
-
-    final response = await http.get(
-      Uri.parse(url.toString()),
-      headers: _urlHeader,
-    );
-
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      List<Comment> comments = [];
-      final list = json.decode(response.body);
-      list.forEach((comment) {
-        comments.add(Comment.fromJson(comment));
-      });
-      return comments;
-    } else {
-      try {
-        WordPressError err =
-            WordPressError.fromJson(json.decode(response.body));
-        throw err;
-      } catch (e) {
-        throw new WordPressError(message: response.body);
-      }
-    }
-  }
-
-  /// This returns a list of [CommentHierarchy] based on the filter parameters
-  /// specified through [ParamsCommentList] object. The list returned has all
-  /// parent comments (i.e. comments directed towards posts) with
-  /// [CommentHierarchy.children] containing the replies to that comment.
-  ///
-  /// In case of an error, a [WordPressError] object is thrown.
-  Future<List<CommentHierarchy>> fetchCommentsAsHierarchy({
-    required ParamsCommentList params,
-  }) async {
-    final StringBuffer url = new StringBuffer(_baseUrl + URL_COMMENTS);
-
-    url.write(params.toString());
-
-    final response = await http.get(
-      Uri.parse(url.toString()),
-      headers: _urlHeader,
-    );
-
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      List<Comment> comments = [];
-      List<CommentHierarchy> commentsHierarchy = [];
-      final list = json.decode(response.body);
-      list.forEach((comment) {
-        comments.add(Comment.fromJson(comment));
-      });
-
-      comments.forEach((comment) {
-        if (comment.parent == 0)
-          commentsHierarchy.add(_commentHierarchyBuilder(comments, comment));
-      });
-      return commentsHierarchy;
-    } else {
-      try {
-        WordPressError err =
-            WordPressError.fromJson(json.decode(response.body));
-        throw err;
-      } catch (e) {
-        throw new WordPressError(message: response.body);
-      }
-    }
-  }
 
   /// This returns a list of [Category] based on the filter parameters
   /// specified through [ParamsCategoryList] object. By default it returns only
@@ -933,11 +811,17 @@ class WordPress {
 
     final response = await http.post(
       Uri.parse(url.toString()),
-      headers: _urlHeader,
-      body: post.toJson(),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "${_urlHeader['Authorization']}"
+      },
+      body: jsonEncode(post.toJson()),
+        //'{"title":"First post as a Chief Editor","status":"draft", "content":"Blah! blah! blah!", "categories":5, "tags":"1", "date":"2015-05-05T10:00:00", "slug":"new-test-post" ,"excerpt":"Discussion about blah!","protected":null,"author":1}'
     );
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
+      print(_urlHeader);
+      print(post.toJson().toString());
       return Post.fromJson(json.decode(response.body));
     } else {
       try {
@@ -1024,7 +908,7 @@ class WordPress {
         .set(HttpHeaders.contentTypeHeader, "application/json; charset=UTF-8");
     request.headers.set(HttpHeaders.acceptHeader, "application/json");
     request.headers.set('Authorization', "${_urlHeader['Authorization']}");
-
+    print(post.toJson());
     request.add(utf8.encode(json.encode(post.toJson())));
     HttpClientResponse response = await request.close();
 
