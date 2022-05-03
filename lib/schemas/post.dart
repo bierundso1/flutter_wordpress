@@ -190,25 +190,30 @@ class Post {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
 
-    data['date'] = this.date;
-    data['date_gmt'] = this.dateGmt;
-    data['password'] = this.password;
-    data['slug'] = this.slug;
-    data['status'] = enumStringToName(this.status.toString());
-    data['title'] = this.title?.toJson();
-    data['content'] = this.content?.toJson();
-    data['excerpt'] = this.excerpt?.toJson();
-    data['author'] = this.authorID;
-    data['featured_media'] = this.featuredMediaID;
-    data['comment_status'] = enumStringToName(this.commentStatus.toString());
-    data['ping_status'] = enumStringToName(this.pingStatus.toString());
-    data['sticky'] = this.sticky;
-    data['template'] = this.template;
-    data['format'] = enumStringToName(this.format.toString());
-    data['categories'] = listToUrlString(this.categoryIDs ?? []);
-    data['tags'] = listToUrlString(this.tagIDs ?? []);
-    if (this.acf != null)
-      data['acf'] = this.acf;
+    if(this.date != null)
+      data['date'] = this.date;
+    if(this.dateGmt != null)
+      data['date_gmt'] = this.dateGmt;
+    if(this.slug != null)
+      data['slug'] = this.slug;
+    if(this.status != null)
+      data['status'] = enumStringToName(this.status.toString());
+    if(this.title != null)
+      data['title'] = this.title?.toJson()['rendered'];
+    if(this.content != null)
+      data['content'] = this.content?.toJson()['rendered'];
+    if(this.excerpt != null)
+      data['excerpt'] = this.excerpt?.toJson()['rendered'];
+    if(this.authorID != null)
+      data['author'] = this.authorID;
+    if(this.format != null)
+      data['format'] = enumStringToName(this.format.toString());
+    if(this.tagIDs != null)
+      data['tags'] = listToUrlString(this.tagIDs ?? []);
+    if(this.acf != null)
+      data['acf'] = this.acf?.toJson();
+    if(this.categoryIDs != null)
+      data['categories'] = listToUrlString(this.categoryIDs ?? []);
 
     return data;
   }
