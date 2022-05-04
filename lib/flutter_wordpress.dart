@@ -837,13 +837,14 @@ class WordPress {
 //  yahya - @mymakarim
 
   Future<dynamic> uploadMedia(File image) async {
+
     final StringBuffer url = new StringBuffer(_baseUrl + URL_MEDIA);
     var file = image.readAsBytesSync();
     final response = await http.post(
       Uri.parse(url.toString()),
       headers: {
-        "Content-Type": "image/png",
-        "Content-Disposition": "form-data; filename=firstIg.png",
+        "Content-Type": "image/jpg",
+        "Content-Disposition": "form-data; filename=${image.path.split('/').last}",
         "Authorization": "${_urlHeader['Authorization']}"
       },
       body: file,
