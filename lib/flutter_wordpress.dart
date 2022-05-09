@@ -851,7 +851,7 @@ class WordPress {
     );
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return json.decode(response.body);
+      return json.decode(response.body.toString());
     } else {
       try {
         WordPressError err =
