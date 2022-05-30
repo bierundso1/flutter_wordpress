@@ -21,9 +21,9 @@ class User {
   AvatarUrls? avatarUrls;
   Map<String, dynamic>? meta;
   Links? lLinks;
-//  yahya - @mymakarim
   String? password;
-//  end yahya - @mymakarim
+
+  Map<String, dynamic>? acf;
 
   User({
     this.id,
@@ -80,6 +80,8 @@ class User {
       });
     }
     lLinks = json['_links'] != null ? new Links.fromJson(json['_links']) : null;
+
+    acf = json['acf'];
   }
 
   Map<String, dynamic> toJson() {
@@ -105,6 +107,9 @@ class User {
     data['meta'] = this.meta;
     data['_links'] = this.lLinks?.toJson();
     data['password'] = this.password;
+
+    if(this.acf != null)
+      data['acf'] = this.acf;
 
     return data;
   }
