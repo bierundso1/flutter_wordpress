@@ -81,7 +81,7 @@ class Media {
         ? new Description.fromJson(json['description'])
         : null;
     caption =
-        json['caption'] != null ? new Caption.fromJson(json['caption']) : null;
+    json['caption'] != null ? new Caption.fromJson(json['caption']) : null;
     altText = json['alt_text'];
     mediaType = json['media_type'];
     mimeType = json['mime_type'];
@@ -235,7 +235,7 @@ class Sizes {
         ? new Thumbnail.fromJson(json['thumbnail'])
         : null;
     medium =
-        json['medium'] != null ? new Medium.fromJson(json['medium']) : null;
+    json['medium'] != null ? new Medium.fromJson(json['medium']) : null;
     mediumLarge = json['medium_large'] != null
         ? new MediumLarge.fromJson(json['medium_large'])
         : null;
