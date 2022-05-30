@@ -4,10 +4,9 @@ class ACF {
   String? herkunftDesBieres;
   String? farbeDerFlasche;
   String? brauerei;
-  String? bewertung;
-  String? bewertungChristoph;
   Map<String, dynamic>? bild_sizes;
   int? imageIDAfterUpload;
+  List<dynamic>? bewertungenJson;
 
   ACF({
     this.bierTyp,
@@ -15,9 +14,8 @@ class ACF {
     this.herkunftDesBieres,
     this.farbeDerFlasche,
     this.brauerei,
-    this.bewertung,
-    this.bewertungChristoph,
-    this.imageIDAfterUpload
+    this.imageIDAfterUpload,
+    this.bewertungenJson,
   });
 
   ACF.fromJson(Map<String, dynamic> json) {
@@ -26,9 +24,8 @@ class ACF {
     herkunftDesBieres = json['herkunft_des_bieres'];
     farbeDerFlasche = json['farbe_der_flasche'];
     brauerei = json['brauerei'] != false ? json['brauerei'] : "";
-    bewertung = json['bewertung'] != false ? json['bewertung'] : "";
-    bewertungChristoph = json['bewertung_christoph'] != false ? json['bewertung_christoph'] : "";
     bild_sizes = json['bild_neben_text_bild'] != false ? json['bild_neben_text_bild'] : null;
+    bewertungenJson = json['bewertungen_app_rep'] != false ? json['bewertungen_app_rep'] : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -38,9 +35,8 @@ class ACF {
     if (this.herkunftDesBieres != null) data['herkunft_des_bieres'] = this.herkunftDesBieres;
     if (this.farbeDerFlasche != null) data['farbe_der_flasche'] = this.farbeDerFlasche;
     if (this.brauerei != null) data['brauerei'] = this.brauerei;
-    if (this.bewertung != null) data['bewertung'] = this.bewertung;
-    if (this.bewertungChristoph != null) data['bewertung_christoph'] = this.bewertungChristoph;
     if (this.imageIDAfterUpload != null) data['bild_neben_text_bild'] = this.imageIDAfterUpload;
+    if (this.bewertungenJson != null) data['bewertungen_app_rep'] = this.bewertungenJson;
 
     return data;
   }
